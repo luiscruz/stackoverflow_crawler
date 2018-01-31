@@ -2,39 +2,82 @@
 <html lang="en">
     <head>
         <meta charset="utf-8">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
         <style>
-            table {
-                border-collapse: collapse;
-                border: 2px black solid;
-                font: 12px sans-serif;
-            }
-
-            td {
-                border: 1px black solid;
-                padding: 5px;
-            }
+          table {
+              border-radius: 5px;
+              width: 50%;
+              margin: 0px auto;
+              float: none;
+          }
         </style>
     </head>
     <body>
-        <h2>Collected Data</h2>
+<div class="jumbotron jumbotron-fluid">
+  <div class="container">
+    <h1 class="display-4">Popularity of Mobile Testing Tools</h1>
+    <p class="lead">This list collects the number of mentions on StackOverflow to assess popularity of testing tools for mobile apps.
+        <br/>
+        <a target='_blank' href='https://github.com/luiscruz/stackoverflow_crawler'>Fork this project on Github.</a>
+    </p>
+  </div>
+</div>
+
+<div  id='content' class='container'>
+</div>
+
+      <hr>
+
+      <footer class='container'>
+        <p>&copy; 2018 <a target='_blank' href='https://luiscruz.github.io'>Luis Cruz</a>.</p>
+      </footer>
+
         <script src="https://d3js.org/d3.v3.min.js"></script>
         <!-- <script src="d3.min.js?v=3.2.8"></script> -->
 
         <script type="text/javascript"charset="utf-8">
-            d3.text("results.csv", function(data) {
-                var parsedCSV = d3.csv.parseRows(data);
+          var tabulate = function (data,columns) {
+            var table = d3.select('#content').append('table').attr("class", "table table-hover table-sm")
+          	var thead = table.append('thead')
+          	var tbody = table.append('tbody')
 
-                var container = d3.select("body")
-                    .append("table")
+          	thead.append('tr')
+          	  .selectAll('th')
+          	    .data(columns)
+          	    .enter()
+          	  .append('th')
+          	    .text(function (d) { return d })
 
-                    .selectAll("tr")
-                        .data(parsedCSV).enter()
-                        .append("tr")
+          	var rows = tbody.selectAll('tr')
+          	    .data(data)
+          	    .enter()
+          	  .append('tr')
 
-                    .selectAll("td")
-                        .data(function(d) { return d; }).enter()
-                        .append("td")
-                        .text(function(d) { return d; });
-            });
+          	var cells = rows.selectAll('td')
+          	    .data(function(row) {
+          	    	return columns.map(function (column) {
+          	    		return { column: column, value: row[column] }
+          	      })
+                })
+                .enter()
+              .append('td')
+                .text(function (d) {
+                  if(d.column == 'github_link'){
+                    return d.value
+                  }
+                  else
+                    return d.value
+                })
+
+            return table;
+          }
+
+          d3.csv('./results.csv',function (data) {
+          	var columns = ['timestamp','keyword', 'count'];
+            tabulate(data,columns)
+          })
         </script>
+            <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+            <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
     </body>
